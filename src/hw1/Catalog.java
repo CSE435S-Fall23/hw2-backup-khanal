@@ -16,12 +16,19 @@ import java.util.*;
 
 public class Catalog {
 	
+	private HashMap<String, HeapFile> nameToHeapFileMap;
+    private HashMap<Integer, String> idToPrimaryKeyMap;
+    private HashMap<Integer, HeapFile> idToHeapFileMap;
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
     	//your code here
+    	this.nameToHeapFileMap = new HashMap<>();
+        this.idToPrimaryKeyMap = new HashMap<>();
+        this.idToHeapFileMap = new HashMap<>();
+    	
     }
 
     /**
@@ -34,6 +41,10 @@ public class Catalog {
      */
     public void addTable(HeapFile file, String name, String pkeyField) {
     	//your code here
+    	int id = file.getId();
+        this.nameToHeapFileMap.put(name, file);
+        this.idToPrimaryKeyMap.put(id, pkeyField);
+        this.idToHeapFileMap.put(id, file);
     }
 
     public void addTable(HeapFile file, String name) {
@@ -46,7 +57,7 @@ public class Catalog {
      */
     public int getTableId(String name) {
     	//your code here
-    	return 0;
+    	return this.nameToHeapFileMap.get(name).getId();
     }
 
     /**
@@ -56,7 +67,7 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
     	//your code here
-    	return null;
+    	return getDbFile(tableid).getTupleDesc();
     }
 
     /**
@@ -67,27 +78,36 @@ public class Catalog {
      */
     public HeapFile getDbFile(int tableid) throws NoSuchElementException {
     	//your code here
-    	return null;
+    	return this.idToHeapFileMap.get(tableid);
     }
 
     /** Delete all tables from the catalog */
     public void clear() {
     	//your code here
+    	this.nameToHeapFileMap.clear();
+        this.idToHeapFileMap.clear();
+        this.idToPrimaryKeyMap.clear(); 	
     }
 
     public String getPrimaryKey(int tableid) {
     	//your code here
-    	return null;
+    	return this.idToPrimaryKeyMap.get(tableid);
+
     }
 
     public Iterator<Integer> tableIdIterator() {
     	//your code here
-    	return null;
+    	return this.idToHeapFileMap.keySet().iterator();
     }
 
     public String getTableName(int id) {
     	//your code here
-    	return null;
+    	for(Map.Entry<String, HeapFile> entry : nameToHeapFileMap.entrySet()) {
+            if(entry.getValue().getId() == id) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
     
     /**
@@ -144,4 +164,3 @@ public class Catalog {
         }
     }
 }
-

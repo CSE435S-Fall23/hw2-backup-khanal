@@ -19,6 +19,8 @@ public class TupleDesc {
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
     	//your code here
+        this.fields = fieldAr;
+        this.types = typeAr;
     }
 
     /**
@@ -26,7 +28,7 @@ public class TupleDesc {
      */
     public int numFields() {
         //your code here
-    	return 0;
+    	return this.fields.length;
     }
 
     /**
@@ -38,7 +40,11 @@ public class TupleDesc {
      */
     public String getFieldName(int i) throws NoSuchElementException {
         //your code here
-    	return null;
+        int fieldLength = this.fields.length;
+        if(i >= 0 && fieldLength > i){
+    	    return this.fields[i];
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -50,7 +56,12 @@ public class TupleDesc {
      */
     public int nameToId(String name) throws NoSuchElementException {
         //your code here
-    	return 0;
+    	for (int index = 0; index < fields.length; index++) {
+			if (fields[index].equals(name)) { 
+				return index;
+			}
+		}
+		throw new NoSuchElementException();
     }
 
     /**
@@ -62,7 +73,10 @@ public class TupleDesc {
      */
     public Type getType(int i) throws NoSuchElementException {
         //your code here
-    	return null;
+        if(i >= 0 && this.types.length > i){
+            return this.types[i];
+        }
+    	throw new NoSuchElementException();
     }
 
     /**
@@ -71,7 +85,15 @@ public class TupleDesc {
      */
     public int getSize() {
     	//your code here
-    	return 0;
+        int size = 0;
+        for(Type type: this.types){
+            if(type == Type.INT){
+                size += 4;
+            }else if (type == Type.STRING){
+                size += 129;
+            }
+        }
+    	return size;
     }
 
     /**
@@ -83,8 +105,24 @@ public class TupleDesc {
      * @return true if the object is equal to this TupleDesc.
      */
     public boolean equals(Object o) {
-    	//your code here
-    	return false;
+        TupleDesc temp = (TupleDesc) o;
+        // if we are comparing the same thing
+        if(this == temp){
+            return true;
+        }
+        int instanceSize = this.getSize();
+
+    	if(instanceSize != temp.getSize()){
+            return false;
+        }
+
+        for(int i = 0; i < instanceSize; i++){
+            if(this.types[i] != temp.types[i]){
+                return false;
+            }
+        }
+
+    	return true;
     }
     
 
