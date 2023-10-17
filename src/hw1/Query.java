@@ -46,7 +46,7 @@ public class Query {
 		TupleDesc tupleDescription = cat.getDbFile(tableIdentifier).getTupleDesc();
 		Relation rel = new Relation(tuples, tupleDescription);
 
-		if (sb.getJoins() != null) {
+		if (sb.getJoins() != null) { 
 			rel = processJoins(cat, sb, rel);
 		}
 
