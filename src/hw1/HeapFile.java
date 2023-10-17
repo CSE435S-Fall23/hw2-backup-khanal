@@ -82,9 +82,10 @@ public class HeapFile {
 	 */
 	public void writePage(HeapPage p) {
 		//your code here
-	 try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+	 try (RandomAccessFile raf = new RandomAccessFile(this.file, "rw")) {
 	        raf.seek(p.getId() * PAGE_SIZE);
 	        raf.write(p.getPageData());
+	        raf.close();
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }

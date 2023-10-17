@@ -107,22 +107,11 @@ public class TupleDesc {
     public boolean equals(Object o) {
         TupleDesc temp = (TupleDesc) o;
         // if we are comparing the same thing
-        if(this == temp){
-            return true;
-        }
-        int instanceSize = this.getSize();
-
-    	if(instanceSize != temp.getSize()){
+        if (this.getSize() != temp.getSize()) {
             return false;
         }
 
-        for(int i = 0; i < instanceSize; i++){
-            if(this.types[i] != temp.types[i]){
-                return false;
-            }
-        }
-
-    	return true;
+        return this.toString().equals(temp.toString());
     }
     
 

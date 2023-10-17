@@ -56,7 +56,7 @@ public class HeapPage {
 	 */
 	public int getNumSlots() {
 		//your code here
-		return this.numSlots;
+		return HeapFile.PAGE_SIZE / (td.getSize() + (getHeaderSize() / this.td.numFields()));
 	}
 
 	/**
@@ -65,7 +65,10 @@ public class HeapPage {
 	 */
 	private int getHeaderSize() {        
 		//your code here
-		return this.header.length / 8;
+		int slotNums = this.numSlots;
+		int offset = slotNums % 8;
+		int index = slotNums / 8;
+		return (int) offset == 0 ? index : index + 1;
 	}
 
 	/**
@@ -77,7 +80,7 @@ public class HeapPage {
 		//your code here
 		int index = s / 8;
 		int offset = s % 8;
-		return (header[index] & offset) == 1;
+		return ((header[index] >> offset) & 1) == 1;
 	}
 
 	/**
@@ -104,11 +107,16 @@ public class HeapPage {
 	 */
 	public void addTuple(Tuple t) throws Exception {
 		//your code here
+		if (!t.getDesc().equals(this.td))
+			throw new Exception();
+		
 		for (int i = 0; i < numSlots; i++) {
 	        if (!slotOccupied(i)) {
 	            if (!t.getDesc().equals(td)) {
 	                throw new Exception("TupleDesc mismatch.");
 	            }
+	            t.setPid(this.id);
+				t.setId(i);
 	            this.tuples[i] = t;
 	            setSlotOccupied(i, true);
 	            return;
@@ -125,12 +133,13 @@ public class HeapPage {
 	 */
 	public void deleteTuple(Tuple t) throws Exception {
 		//your code here
-		 int tupleId = t.getId();
-		    if (t.getPid() != id || !slotOccupied(tupleId)) {
-		        throw new Exception("Tuple is not in the page.");
-		    }
-		    this.tuples[tupleId] = null;
-		    setSlotOccupied(tupleId, false);
+		int tupleId = t.getId();
+	    if (t.getPid() != id || tupleId < 0 || tupleId >= tuples.length) {
+	        throw new Exception("Cannot delete tuple");
+	    }
+	    
+	    this.tuples[tupleId] = null;
+	    setSlotOccupied(tupleId, false);
 	}
 	
 	/**
@@ -140,14 +149,18 @@ public class HeapPage {
 		// if associated bit is not set, read forward to the next tuple, and
 		// return null.
 		if (!slotOccupied(slotId)) {
-			for (int i=0; i<td.getSize(); i++) {
-				try {
-					dis.readByte();
-				} catch (IOException e) {
-					throw new NoSuchElementException("error reading empty tuple");
-				}
-			}
-			return null;
+		    for (int i=0; i<td.getSize(); i++) {
+		        try {
+		            if (dis.available() > 0) {
+		                dis.readByte();
+		            } else {
+		                break; // Exit the loop if no more bytes are available
+		            }
+		        } catch (IOException e) {
+		            throw new NoSuchElementException("error reading empty tuple");
+		        }
+		    }
+		    return null;
 		}
 
 		// read fields in the tuple
