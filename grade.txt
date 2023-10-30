@@ -1,0 +1,11 @@
+Relation: 25/55
+	Join, Aggregate, and Select failed
+	
+Aggregate: 10/10
+Query: 10/30
+	Join, Aggregate, and Select failed. No AS
+	
+Unit Tests: 0/5
+	Unit tests unoriginal and also both failed
+	
+45/100 
